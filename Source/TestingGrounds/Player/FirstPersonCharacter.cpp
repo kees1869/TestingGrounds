@@ -51,8 +51,12 @@ void AFirstPersonCharacter::BeginPlay()
 	}
 	Gun = GetWorld()->SpawnActor<AGun>(GunBlueprint);
 	Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Grippoint"));
+	Gun->AnimInstance = Mesh1P->GetAnimInstance();
 
-
+	if (EnableTouchscreenMovement(InputComponent) == false)
+	{
+		InputComponent->BindAction("Fire", IE_Pressed, Gun, &AGun::OnFire);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -61,29 +65,25 @@ void AFirstPersonCharacter::BeginPlay()
 void AFirstPersonCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// set up gameplay key bindings
-	check(PlayerInputComponent);
+	check(InputComponent);
 
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	//InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AFirstPersonCharacter::TouchStarted);
-	if (EnableTouchscreenMovement(PlayerInputComponent) == false)
-	{
-		//PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFirstPersonCharacter::OnFire);
-	}
 
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AFirstPersonCharacter::OnResetVR);
+	InputComponent->BindAction("ResetVR", IE_Pressed, this, &AFirstPersonCharacter::OnResetVR);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &AFirstPersonCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AFirstPersonCharacter::MoveRight);
+	InputComponent->BindAxis("MoveForward", this, &AFirstPersonCharacter::MoveForward);
+	InputComponent->BindAxis("MoveRight", this, &AFirstPersonCharacter::MoveRight);
 
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
-	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("TurnRate", this, &AFirstPersonCharacter::TurnAtRate);
-	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-	PlayerInputComponent->BindAxis("LookUpRate", this, &AFirstPersonCharacter::LookUpAtRate);
+	InputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	InputComponent->BindAxis("TurnRate", this, &AFirstPersonCharacter::TurnAtRate);
+	InputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+	InputComponent->BindAxis("LookUpRate", this, &AFirstPersonCharacter::LookUpAtRate);
 }
 
 void AFirstPersonCharacter::OnResetVR()
