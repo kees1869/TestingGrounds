@@ -38,7 +38,7 @@ void AMannequin::BeginPlay()
 	Gun = GetWorld()->SpawnActor<AGun>(GunBlueprint);
 
 	//Attach gun mesh component to Skeleton, doing it here because the skelton is not yet created in the constructor
-	if (Controller->IsPlayerController())
+	if (IsPlayerControlled())
 	{
 		Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 	}
